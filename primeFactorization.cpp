@@ -51,62 +51,53 @@ bool millerRabinTest(const cpp_int& n) {
     return true;
 }
 
-void printFactors(cpp_int n, bool isRoot = true) {
-    cpp_int factor = 2;
-    bool firstFactor = true;
-    while (n > 1 && factor * factor <= n) {
-        if (millerRabinTest(n)) factor = n;
-        int exp = 0;
-        while (n % factor == 0) {
-            ++exp;
-            n /= factor;
-        }
-        if (exp > 0) {
-            if (!firstFactor) std::cout << " * ";
-            firstFactor = false;
-            
-            std::cout << factor;
-            if (exp > 1) {
-                std::cout << "^";
-                if (!millerRabinTest(exp)) { // exp is composite
-                    std::cout << "(";
-                    printFactors(exp, false); // Recursive call for exponent factorization
-                    std::cout << ")";
-                } else {
-                    std::cout << exp; // exp is prime
-                }
-            }
-            std::cout.flush(); // Ensure the output is printed immediately
-        }
-        factor = (factor == 2) ? cpp_int(3) : factor + 2;
-    }
-    if (n > 1) {
-        if (!firstFactor) std::cout << " * ";
-        std::cout << n;
-        std::cout.flush();
-    }
+cpp_int findFactor(const cpp_int& n) {
+    if ((n & 1) == 0)
+        return cpp_int(2);
+    if (millerRabinTest(n))
+        return n;
+    for (cpp_int factor = 3; factor * factor <= n; factor += 2)
+        if (n % factor == 0)
+            return factor;
+    return n;
 }
 
 void primeFactorization(cpp_int n) {
-    if (n <= 1) {
-        std::cout << "No prime factorization for " << n << std::endl;
-        return;
-    }
+    cpp_int fac;
+    do {
+        fac = findFactor(n);
+        cpp_int exp = 0;
 
-    if (millerRabinTest(n)) {
-        std::cout << n << " = " << n << " (prime)" << std::endl;
-        return;
-    }
+        if (fac == n) {
+            std::cout << n;
+            return;
+        }
 
-    std::cout << n << " = ";
-    printFactors(n);
-    std::cout << std::endl;
+        do {
+            ++exp;
+            n /= fac;
+        } while ((n % fac) == 0);
+
+        std::cout << fac;
+
+        if (exp > 1) {
+            std::cout << "^";
+            if (!millerRabinTest(exp)) {
+                std::cout << "(";
+                primeFactorization(exp);
+                std::cout << ")";
+            } else std::cout << exp;
+        }
+
+        if (n > 2) std::cout << " * ";
+        std::cout.flush();
+    } while (n > 1);
 }
 
 int main(int argc, char* argv[]) {
     if (argc != 2) {
         std::cerr << "Usage: " << argv[0] << " <positive integer greater than 1>" << std::endl;
-        return 1;
+        return -1;
     }
 
     cpp_int number;
@@ -114,15 +105,17 @@ int main(int argc, char* argv[]) {
         number = cpp_int(argv[1]);
     } catch (const std::exception& e) {
         std::cerr << "Error: Invalid input: " << e.what() << std::endl;
-        return 1;
+        return -1;
     }
 
     if (number < 2) {
         std::cerr << "Usage: " << argv[0] << "< positive integer greater than 1>" << std::endl;
-        return 1;
+        return -1;
     }
 
+    std::cout << number << " = ";
     primeFactorization(number);
+    std::cout << std::endl;
 
     return 0;
 }
