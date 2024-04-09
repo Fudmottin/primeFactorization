@@ -55,6 +55,7 @@ void printFactors(cpp_int n, bool isRoot = true) {
     cpp_int factor = 2;
     bool firstFactor = true;
     while (n > 1 && factor * factor <= n) {
+        if (millerRabinTest(n)) factor = n;
         int exp = 0;
         while (n % factor == 0) {
             ++exp;
