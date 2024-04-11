@@ -10,7 +10,7 @@ to their respective powers.
 The program can be compiled using the following command:
 
 ```sh
-c++ -std=c++20 -O3 -o primeFactorization primeFactorization.cpp
+c++ -std=c++20 -O3 -o primeFactorization primeFactorization.cpp external/Miller_Rabin/miller_rabin.cpp
 ```
 
 ## Usage
