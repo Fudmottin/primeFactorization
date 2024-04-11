@@ -4,12 +4,31 @@
 
 using namespace boost::multiprecision;
 
+cpp_int ceil_sqrt(const cpp_int& n) {
+    cpp_int left = 0;
+    cpp_int right = n;
+    cpp_int result = 0;
+
+    while (left <= right) {
+        cpp_int mid = left + (right - left) / 2;
+        if (mid * mid <= n) {
+            result = mid;
+            left = mid + 1;
+        } else {
+            right = mid - 1;
+        }
+    }
+
+    return result;
+}
+
 cpp_int findFactor(const cpp_int& n) {
     if ((n & 1) == 0)
         return cpp_int(2);
-    if (fudmottin::millerRabinTest(n))
+     if (fudmottin::millerRabinTest(n))
         return n;
-    for (cpp_int factor = 3; factor * factor <= n; factor += 2)
+    auto sqrt_n = ceil_sqrt(n);
+    for (cpp_int factor = 3; factor <= sqrt_n; factor += 2)
         if (n % factor == 0)
             return factor;
     return n;
