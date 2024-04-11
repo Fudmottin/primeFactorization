@@ -1,0 +1,3 @@
+[submodule "external/Miller_Rabin"]
+	path = external/Miller_Rabin
+	url = https://github.com/fudmottin/Miller_Rabin.git
