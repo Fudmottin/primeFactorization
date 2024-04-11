@@ -1,8 +1,8 @@
 #include <iostream>
 #include <boost/multiprecision/cpp_int.hpp>
-#include "Miller_Rabin/miller_rabin.hpp>"
+#include "external/Miller_Rabin/miller_rabin.hpp"
 
-using namespace boost::multiprecision::cpp_int;
+using namespace boost::multiprecision;
 
 cpp_int findFactor(const cpp_int& n) {
     if ((n & 1) == 0)
