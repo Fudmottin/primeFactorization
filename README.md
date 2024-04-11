@@ -5,12 +5,27 @@ This C++ program performs prime factorization for positive integers greater than
 showing the prime factorization in the form of a product of prime numbers raised
 to their respective powers.
 
+## Getting the source with gh
+
+```sh
+gh repo clone Fudmottin/primeFactorization
+cd primeFactorization/external
+gh repo clone Fudmottin/Miller_Rabin
+cd ..
+```
+
 ## Compilation
 
 The program can be compiled using the following command:
 
 ```sh
 c++ -std=c++20 -O3 -o primeFactorization primeFactorization.cpp external/Miller_Rabin/miller_rabin.cpp
+```
+
+My M2 MacMini requires the following compile command:
+
+```sh
+c++ -std=c++20 -O3 -I /opt/homebrew/Cellar/boost/1.84.0_1/include/ -o primeFactorization primeFactorization.cpp external/Miller_Rabin/miller_rabin.cpp
 ```
 
 ## Usage
