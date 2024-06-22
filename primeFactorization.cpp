@@ -85,7 +85,7 @@ int main(int argc, char* argv[]) {
         return -1;
     }
 
-    std::cout << number << " = ";
+    std::cout << " = ";
     primeFactorization(number);
     std::cout << std::endl;
 
