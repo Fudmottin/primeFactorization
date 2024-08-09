@@ -1,4 +1,6 @@
 #include <iostream>
+#include <vector>
+#include <cmath>
 #include <boost/multiprecision/cpp_int.hpp>
 #include "external/Miller_Rabin/miller_rabin.hpp"
 
@@ -22,15 +24,46 @@ cpp_int ceil_sqrt(const cpp_int& n) {
     return result;
 }
 
+cpp_int gcd(const cpp_int& a, const cpp_int& b) {
+    if (b == 0)
+        return a;
+    return gcd(b, a % b);
+}
+
+cpp_int pollardsRho(const cpp_int& n) {
+    cpp_int x = 2, y = 2, d = 1;
+    const cpp_int c = 1;  // constant in the polynomial x^2 + c
+
+    auto f = [&](const cpp_int& x) { return (x * x + c) % n; };
+
+    while (d == 1) {
+        x = f(x);
+        y = f(f(y));
+        d = gcd(abs(x - y), n);
+    }
+
+    return d;
+}
+
 cpp_int findFactor(const cpp_int& n) {
-    if ((n & 1) == 0)
-        return cpp_int(2);
-     if (fudmottin::millerRabinTest(n))
+    if (n % 2 == 0)
+        return 2;
+
+    if (fudmottin::millerRabinTest(n))
         return n;
+
+    // Use Pollard's Rho for more efficient factorization
+    cpp_int factor = pollardsRho(n);
+    if (factor < n)
+        return factor;
+
+    // If Pollard's Rho fails, fallback to brute force
     auto sqrt_n = ceil_sqrt(n);
-    for (cpp_int factor = 3; factor <= sqrt_n; factor += 2)
+    for (cpp_int factor = 3; factor <= sqrt_n; factor += 2) {
         if (n % factor == 0)
             return factor;
+    }
+
     return n;
 }
 
