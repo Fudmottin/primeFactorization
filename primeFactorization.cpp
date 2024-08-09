@@ -66,10 +66,9 @@ cpp_int findFactor(const cpp_int& n) {
     }
 
     // Ensure the factor is prime
-    if (fudmottin::millerRabinTest(factor))
-        return factor;
-    else
+    if (!fudmottin::millerRabinTest(factor))
         return findFactor(factor);
+    return factor;
 }
 
 void primeFactorization(cpp_int n) {
