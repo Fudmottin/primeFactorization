@@ -54,17 +54,22 @@ cpp_int findFactor(const cpp_int& n) {
 
     // Use Pollard's Rho for more efficient factorization
     cpp_int factor = pollardsRho(n);
-    if (factor < n)
-        return factor;
 
-    // If Pollard's Rho fails, fallback to brute force
-    auto sqrt_n = ceil_sqrt(n);
-    for (cpp_int factor = 3; factor <= sqrt_n; factor += 2) {
-        if (n % factor == 0)
-            return factor;
+    // If factor equals n, Pollard's Rho failed, fallback to brute force
+    if (factor == n) {
+        auto sqrt_n = ceil_sqrt(n);
+        for (cpp_int factor = 3; factor <= sqrt_n; factor += 2) {
+            if (n % factor == 0)
+                return factor;
+        }
+        return n;
     }
 
-    return n;
+    // Ensure the factor is prime
+    if (fudmottin::millerRabinTest(factor))
+        return factor;
+    else
+        return findFactor(factor);
 }
 
 void primeFactorization(cpp_int n) {
