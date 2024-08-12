@@ -1,10 +1,12 @@
 #include <iostream>
 #include <vector>
 #include <cmath>
+#include <thread>
+#include <future>
 #include <boost/multiprecision/cpp_int.hpp>
 #include "external/Miller_Rabin/miller_rabin.hpp"
 
-using namespace boost::multiprecision;
+using boost::multiprecision::cpp_int;
 
 cpp_int ceil_sqrt(const cpp_int& n) {
     cpp_int left = 0;
@@ -30,6 +32,7 @@ cpp_int gcd(const cpp_int& a, const cpp_int& b) {
     return gcd(b, a % b);
 }
 
+// https://en.wikipedia.org/wiki/Pollard's_rho_algorithm
 cpp_int pollardsRho(const cpp_int& n) {
     cpp_int x = 2, y = 2, d = 1;
     const cpp_int c = 1;  // constant in the polynomial x^2 + c
@@ -45,6 +48,39 @@ cpp_int pollardsRho(const cpp_int& n) {
     return d;
 }
 
+// Enhanced Pollard's Rho function with customizable polynomial
+cpp_int pollardsRhoEnhanced(const cpp_int& n, const cpp_int& seed = 2, const cpp_int& c = 1) {
+    cpp_int x = seed, y = seed, d = 1;
+
+    auto f = [&](const cpp_int& x) { return (x * x + c) % n; };
+
+    while (d == 1) {
+        x = f(x);
+        y = f(f(y));
+        d = gcd(abs(x - y), n);
+    }
+
+    return d;
+}
+
+// Threaded Pollard's Rho with different seeds and constants
+cpp_int parallelPollardsRho(const cpp_int& n) {
+    std::vector<std::future<cpp_int>> futures;
+
+    for (cpp_int seed = 2; seed < 5; ++seed) {
+        futures.push_back(std::async(std::launch::async, pollardsRhoEnhanced, n, seed, seed + 1));
+    }
+
+    for (auto& f : futures) {
+        cpp_int factor = f.get();
+        if (factor != n) {
+            return factor;
+        }
+    }
+
+    return n;
+}
+
 cpp_int findFactor(const cpp_int& n) {
     if (n % 2 == 0)
         return 2;
@@ -52,22 +88,12 @@ cpp_int findFactor(const cpp_int& n) {
     if (fudmottin::millerRabinTest(n))
         return n;
 
-    // Use Pollard's Rho for more efficient factorization
-    cpp_int factor = pollardsRho(n);
-
-    // If factor equals n, Pollard's Rho failed, fallback to brute force
-    if (factor == n) {
-        auto sqrt_n = ceil_sqrt(n);
-        for (cpp_int factor = 3; factor <= sqrt_n; factor += 2) {
-            if (n % factor == 0)
-                return factor;
-        }
-        return n;
-    }
+    auto factor = parallelPollardsRho(n);
 
     // Ensure the factor is prime
-    if (!fudmottin::millerRabinTest(factor))
+    if (!fudmottin::millerRabinTest(factor) && (factor != n))
         return findFactor(factor);
+
     return factor;
 }
 
