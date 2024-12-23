@@ -25,7 +25,7 @@ c++ -std=c++20 -O3 -o primeFactorization primeFactorization.cpp external/Miller_
 My M2 MacMini requires the following compile command:
 
 ```sh
-c++ -std=c++20 -O3 -I /opt/homebrew/include/ -o primeFactorization primeFactorization.cpp external/Miller_Rabin/miller_rabin.cpp
+c++ -std=c++20 -O3 -I /opt/homebrew/include/ -L /opt/homebrew/lib/ -lboost_random -o primeFactorization primeFactorization.cpp external/Miller_Rabin/miller_rabin.cpp
 ```
 
 ## Usage
