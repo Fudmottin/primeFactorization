@@ -30,8 +30,14 @@ cpp_int ceil_sqrt(const cpp_int& n) {
 }
 
 cpp_int gcd(const cpp_int& a, const cpp_int& b) {
-    if (b == 0) return a;
-    return gcd(b, a % b);
+    cpp_int x = a;
+    cpp_int y = b;
+    while (y != 0) {
+        cpp_int temp = y;
+        y = x % y;
+        x = temp;
+    }
+    return x;
 }
 
 // https://en.wikipedia.org/wiki/Pollard's_rho_algorithm
